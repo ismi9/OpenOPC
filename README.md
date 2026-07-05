@@ -1,4 +1,4 @@
-<h1 align="center" style="font-size: 1.75em;">OpenOPC: Your Personal AI-Native Company —<br>Self-Built, Self-Run, Self-Grown</h1>
+<h1 align="center" style="font-size: 1.75em;">OpenOPC: Build Your Personal AI-Native Company — Self-Built, Self-Run, Self-Grown</h1>
 
 🏗️ **Self-Built** — Fully automated to recruit role-specific AI employees and build the org.
 
