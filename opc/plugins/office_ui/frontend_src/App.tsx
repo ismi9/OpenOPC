@@ -459,6 +459,14 @@ export default function App() {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
   const [theme, setTheme] = useState<ThemeName>('openopc')
   const [showSubagents, setShowSubagents] = useState(true)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('opc_office_sidebar_collapsed') === '1' } catch { return false }
+  })
+  const toggleSidebar = () => setSidebarCollapsed(v => {
+    const next = !v
+    try { localStorage.setItem('opc_office_sidebar_collapsed', next ? '1' : '0') } catch { /* private mode */ }
+    return next
+  })
   const [eventTypeFilter, setEventTypeFilter] = useState('all')
   const [activePage, setActivePage] = useState<AppPage>('workspace')
   const [swarmAgents, setSwarmAgents] = useState<AgentInfo[]>([])
@@ -2408,12 +2416,20 @@ export default function App() {
       )}
 
       {/* Main Grid */}
-      <main className={`main-grid${activePage !== 'office' ? ' hidden' : ''}`}>
+      <main className={`main-grid${activePage !== 'office' ? ' hidden' : ''}${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
         {/* Phaser Game Canvas */}
         <section className="canvas-wrap">
           <PhaserGame bridge={bridgeRef.current} />
           <button className="canvas-float-btn" onClick={() => setShowSubagents((v) => !v)} title={showSubagents ? 'Hide sub-agents' : 'Show sub-agents'}>
             {showSubagents ? '👥' : '👤'}
+          </button>
+          <button
+            className="sidebar-collapse-btn"
+            onClick={toggleSidebar}
+            title={sidebarCollapsed ? 'Show side panel' : 'Hide side panel'}
+            aria-label={sidebarCollapsed ? 'Show side panel' : 'Hide side panel'}
+          >
+            <span className="collapse-glyph">{sidebarCollapsed ? '❮' : '❯'}</span>
           </button>
         </section>
 

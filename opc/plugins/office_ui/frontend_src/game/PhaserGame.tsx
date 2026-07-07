@@ -15,47 +15,51 @@ export function PhaserGame({ bridge }: Props) {
   const gameRef = useRef<Phaser.Game | null>(null)
 
   useEffect(() => {
-    if (!wrapperRef.current || !containerRef.current || gameRef.current) return
+    if (!wrapperRef.current || !containerRef.current) return
 
-    // Measure the wrapper (which has definite CSS dimensions from the grid layout).
-    // The inner container div is initially empty so has 0 dimensions.
     const wrapper = wrapperRef.current
     const container = containerRef.current
 
-    // Force container to fill wrapper so clientWidth/Height are non-zero
-    container.style.width  = `${wrapper.clientWidth}px`
-    container.style.height = `${wrapper.clientHeight}px`
-
-    // Safety: never create a 0×0 game
-    const w = container.clientWidth  || window.innerWidth  - 400
-    const h = container.clientHeight || window.innerHeight - 48
-
-    if (w < 50 || h < 50) {
-      console.warn('[PhaserGame] Container too small:', w, h, '— using fallback size')
-      container.style.width  = `${window.innerWidth - 400}px`
-      container.style.height = `${window.innerHeight - 48}px`
+    const createGame = (w: number, h: number) => {
+      console.log('[PhaserGame] Creating Phaser game', w, '×', h)
+      const config = createGameConfig(container, w, h)
+      config.scene = [BootScene, OfficeScene]
+      const game = new Phaser.Game(config)
+      game.registry.set('bridge', bridge)
+      gameRef.current = game
     }
 
-    console.log('[PhaserGame] Creating Phaser game', container.clientWidth, '×', container.clientHeight)
-
-    const config = createGameConfig(container)
-    config.scene = [BootScene, OfficeScene]
-    const game = new Phaser.Game(config)
-    game.registry.set('bridge', bridge)
-    gameRef.current = game
-
-    // Keep canvas sized to wrapper on window resize
-    const onResize = () => {
-      if (!wrapper || !game) return
-      container.style.width  = `${wrapper.clientWidth}px`
-      container.style.height = `${wrapper.clientHeight}px`
-      game.scale.resize(wrapper.clientWidth, wrapper.clientHeight)
+    if (typeof ResizeObserver === 'undefined') {
+      createGame(wrapper.clientWidth || window.innerWidth - 380, wrapper.clientHeight || window.innerHeight - 48)
+      return () => {
+        gameRef.current?.destroy(true)
+        gameRef.current = null
+      }
     }
-    window.addEventListener('resize', onResize)
+
+    // The office page can start hidden (display:none → 0×0). Never create or
+    // resize the game at zero size; wait for the first real layout instead.
+    const observer = new ResizeObserver((entries) => {
+      const rect = entries[entries.length - 1].contentRect
+      const w = Math.floor(rect.width)
+      const h = Math.floor(rect.height)
+      if (w < 1 || h < 1) return // hidden — keep last known size
+      if (!gameRef.current) {
+        createGame(w, h)
+      } else {
+        // In RESIZE scale mode the game follows parentSize, which Phaser only
+        // re-measures on its 500ms poll — and scale.resize() gets clobbered by
+        // that stale value. Re-measure the parent, then refresh.
+        const scale = gameRef.current.scale
+        scale.getParentBounds()
+        scale.refresh()
+      }
+    })
+    observer.observe(wrapper)
 
     return () => {
-      window.removeEventListener('resize', onResize)
-      game.destroy(true)
+      observer.disconnect()
+      gameRef.current?.destroy(true)
       gameRef.current = null
     }
   }, [bridge]) // bridge is a stable ref, effect runs once
@@ -63,8 +67,9 @@ export function PhaserGame({ bridge }: Props) {
   return (
     // Wrapper fills the CSS grid cell
     <div ref={wrapperRef} style={{ width: '100%', height: '100%' }}>
-      {/* Phaser mounts its canvas inside this div */}
-      <div ref={containerRef} />
+      {/* Phaser mounts its canvas inside this div; it must track the wrapper
+          so Phaser's own parent-bounds polling reads the true size. */}
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
     </div>
   )
 }

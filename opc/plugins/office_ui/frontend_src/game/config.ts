@@ -99,9 +99,9 @@ export const STATUS_BUBBLE_DURATION = 5.0
 export const INACTIVE_SEAT_TIMER_MIN = 3.0
 export const INACTIVE_SEAT_TIMER_RANGE = 2.0
 
-export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
-  const w = parent.clientWidth || window.innerWidth - 380
-  const h = parent.clientHeight || window.innerHeight - 48
+export function createGameConfig(parent: HTMLElement, width?: number, height?: number): Phaser.Types.Core.GameConfig {
+  const w = width || parent.clientWidth || window.innerWidth - 380
+  const h = height || parent.clientHeight || window.innerHeight - 48
   const skyHex = isLocalDaytime() ? '#a8d4ec' : '#31453a'
   return {
     type: Phaser.CANVAS,

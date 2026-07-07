@@ -320,9 +320,9 @@ export class OfficeScene extends Phaser.Scene {
       targets: cam,
       zoom: targetZoom,
       duration: 260,
-      ease: 'Cubic.Out',
+      ease: 'Cubic.easeOut',
     })
-    cam.pan(targetX, targetY, 260, 'Cubic.Out')
+    cam.pan(targetX, targetY, 260, 'Cubic.easeOut')
   }
 
   panToOffice(officeId: string) {
@@ -343,9 +343,9 @@ export class OfficeScene extends Phaser.Scene {
       targets: cam,
       zoom: targetZoom,
       duration: 380,
-      ease: 'Cubic.Out',
+      ease: 'Cubic.easeOut',
     })
-    cam.pan(cx, cy, 380, 'Cubic.Out')
+    cam.pan(cx, cy, 380, 'Cubic.easeOut')
   }
 
   // ── Agent management ──────────────────────────────────

@@ -478,10 +478,20 @@ html, body, #root {
   height: 100%;
   min-height: 0;
   overflow: hidden;
+  /* Canvas follows via ResizeObserver in PhaserGame, so the column change animates cleanly */
+  transition: grid-template-columns 220ms ease;
 }
 
 .main-grid.hidden {
   display: none;
+}
+
+.main-grid.sidebar-collapsed {
+  grid-template-columns: 1fr 0px;
+}
+
+.main-grid.sidebar-collapsed .sidebar {
+  border-left: none;
 }
 
 /* ── Canvas ─────────────────────────────────────────── */
@@ -533,6 +543,35 @@ html, body, #root {
   background: var(--surface-hover);
   border-color: var(--border-hover);
   transform: scale(1.05);
+}
+
+/* Handle on the canvas/sidebar boundary that collapses or expands the side panel */
+.sidebar-collapse-btn {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  background: rgba(20, 27, 43, 0.94);
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  transition: background 150ms, color 150ms;
+}
+
+.sidebar-collapse-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 /* ── Sidebar ────────────────────────────────────────── */
@@ -1314,12 +1353,36 @@ html, body, #root {
   .main-grid {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr);
+    transition: grid-template-rows 220ms ease;
+  }
+  .main-grid.sidebar-collapsed {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) 0;
+  }
+  .main-grid.sidebar-collapsed .sidebar {
+    border-top: none;
   }
   .sidebar {
     border-left: none;
     border-top: 1px solid var(--border);
     max-height: 48vh;
     min-height: 0;
+  }
+  /* Sidebar stacks below the canvas here — move the handle to the bottom edge */
+  .sidebar-collapse-btn {
+    top: auto;
+    bottom: 0;
+    right: 50%;
+    transform: translateX(50%);
+    width: 56px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+  }
+  .sidebar-collapse-btn .collapse-glyph {
+    display: inline-block;
+    transform: rotate(90deg);
   }
   .stat-chips { display: none; }
 }

@@ -36,6 +36,7 @@ export class GameBridge extends Phaser.Events.EventEmitter {
   pushEvent(evt: VisualEvent) {
     if (!this.scene) {
       this.eventQueue.push(evt)
+      if (this.eventQueue.length > 500) this.eventQueue.shift()
       return
     }
     this.applyEvent(evt)
@@ -45,7 +46,11 @@ export class GameBridge extends Phaser.Events.EventEmitter {
     const agentCount = Object.keys(snapshot.agents ?? {}).length
     if (!this.scene) {
       console.log(`[GameBridge] pushSnapshot queued (scene not ready) — ${agentCount} agents`)
-      this.snapshotQueue.push(snapshot)
+      // A snapshot fully resets the scene, so it supersedes anything queued
+      // before it. The game may not be created until the Office page is first
+      // opened — keep the queues bounded in the meantime.
+      this.snapshotQueue = [snapshot]
+      this.eventQueue = []
       return
     }
     console.log(`[GameBridge] pushSnapshot applying now — ${agentCount} agents`)

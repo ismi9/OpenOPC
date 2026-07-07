@@ -1,5 +1,9 @@
 <h1 align="center" style="font-size: 1.75em;">OpenOPC: Build Your Personal AI-Native Company — Self-Built, Self-Run, Self-Grown</h1>
 
+<p align="center">
+  <b>English</b> | <a href="README.zh-CN.md">简体中文</a>
+</p>
+
 🏗️ **Self-Built** — Fully automated to recruit role-specific AI employees and build the org.
 
 ⚙️ **Self-Run** — Fully automated to assign tasks, drive handoffs, and keep moving toward your goal.
@@ -19,8 +23,8 @@
 
 ## Table Of Contents
 
-- [Real-World Applications](#real-world-applications)
 - [When To Use OpenOPC](#when-to-use-openopc)
+- [Demos](#demos)
 - [How OpenOPC Works](#how-openopc-works)
 - [Quick Start](#quick-start)
 - [Office UI Guide](#office-ui-guide)
